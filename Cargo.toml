@@ -1,25 +1,46 @@
 [package]
-name = "tyl-{module-name}"
+name = "tyl-redis-pubsub-adapter"
 version = "0.1.0"
 edition = "2021"
 authors = ["TYL Framework Team"]
 license = "AGPL-3.0"
-repository = "https://github.com/the-yaml-life/tyl-{module-name}"
-description = "{Replace with module description}"
-homepage = "https://github.com/the-yaml-life/tyl-{module-name}"
-documentation = "https://docs.rs/tyl-{module-name}"
+repository = "https://github.com/the-yaml-life/tyl-redis-pubsub-adapter"
+description = "Redis PubSub adapter implementation for TYL framework pubsub port"
+homepage = "https://github.com/the-yaml-life/tyl-redis-pubsub-adapter"
+documentation = "https://docs.rs/tyl-redis-pubsub-adapter"
 readme = "README.md"
-keywords = ["{module-keywords}", "hexagonal-architecture", "rust", "tyl-framework"]
-categories = ["development-tools", "rust-patterns"]
+keywords = ["redis", "pubsub", "hexagonal-architecture", "rust", "tyl-framework"]
+categories = ["database", "development-tools", "rust-patterns"]
 
 [dependencies]
-# Common TYL dependencies - adjust as needed
+# Core TYL Framework modules
+tyl-errors = { git = "https://github.com/the-yaml-life/tyl-errors.git", branch = "main" }
+tyl-config = { git = "https://github.com/the-yaml-life/tyl-config.git", branch = "main" }
+tyl-logging = { git = "https://github.com/the-yaml-life/tyl-logging.git", branch = "main" }
+tyl-tracing = { git = "https://github.com/the-yaml-life/tyl-tracing.git", branch = "main" }
+
+# PubSub port and existing Redis adapter
+tyl-pubsub-port = { git = "https://github.com/the-yaml-life/tyl-pubsub-port.git", branch = "main" }
+tyl-redis-adapter = { git = "https://github.com/the-yaml-life/tyl-redis-adapter.git", branch = "main" }
+
+# Redis and async dependencies
+redis = { version = "0.32", features = ["tokio-comp", "connection-manager"] }
+tokio = { version = "1.0", features = ["full"] }
+futures = "0.3"
+futures-util = "0.3"
+async-trait = "0.1"
+
+# Serialization and utilities
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-thiserror = "1.0"
 uuid = { version = "1.0", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
 
-# Add module-specific dependencies here
+# Error handling and observability
+thiserror = "1.0"
+tracing = "0.1"
 
 [dev-dependencies]
 # Development dependencies for testing
+tokio-test = "0.4"
+testcontainers = "0.15"

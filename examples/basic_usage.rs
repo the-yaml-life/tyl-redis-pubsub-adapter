@@ -1,64 +1,114 @@
-use tyl_{module_name}::{BasicAdapter, MainTrait, MainType};
+//! Basic usage example for TYL Redis PubSub Adapter
+//!
+//! This example demonstrates how to use the Redis PubSub adapter
+//! for publishing and subscribing to events.
 
-fn main() {
-    println!("=== TYL {Module Name} Basic Usage ===\n");
+use serde::{Deserialize, Serialize};
+use tyl_redis_pubsub_adapter::{EventPublisher, RedisConfig, RedisPubSubAdapter};
 
-    // Basic usage example
-    basic_usage_example();
-    
-    // Custom configuration example
-    custom_config_example();
-    
-    // Error handling example
-    error_handling_example();
+#[derive(Debug, Serialize, Deserialize)]
+struct UserEvent {
+    user_id: String,
+    action: String,
+    timestamp: i64,
 }
 
-fn basic_usage_example() {
-    println!("--- Basic Usage ---");
-    
-    let config = MainType::new("my-service");
-    let adapter = BasicAdapter::new(config);
-    
-    match adapter.operation("test input") {
-        Ok(result) => println!("✅ Success: {}", result),
-        Err(e) => println!("❌ Error: {}", e),
-    }
-    
-    println!();
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    println!("=== TYL Redis PubSub Basic Usage ===\n");
+
+    // Basic publishing example
+    basic_publishing_example().await?;
+
+    // Batch publishing example
+    batch_publishing_example().await?;
+
+    // Publishing with keys example
+    keyed_publishing_example().await?;
+
+    println!("✅ All examples completed successfully!");
+    Ok(())
 }
 
-fn custom_config_example() {
-    println!("--- Custom Configuration ---");
-    
-    let config = MainType::new("custom-service");
-    let adapter = BasicAdapter::new(config);
-    
-    // Example with different inputs
-    let inputs = vec!["hello", "world", "rust"];
-    
-    for input in inputs {
-        match adapter.operation(input) {
-            Ok(result) => println!("  {} -> {}", input, result),
-            Err(e) => println!("  {} -> Error: {}", input, e),
-        }
-    }
-    
+async fn basic_publishing_example() -> Result<(), Box<dyn std::error::Error>> {
+    println!("--- Basic Publishing ---");
+
+    // Create Redis PubSub adapter with default configuration
+    let config = RedisConfig::default();
+    let adapter = RedisPubSubAdapter::new(config).await?;
+
+    // Create a sample event
+    let event = UserEvent {
+        user_id: "user123".to_string(),
+        action: "login".to_string(),
+        timestamp: 1234567890,
+    };
+
+    // Publish the event
+    let event_id = adapter.publish("user.events", event).await?;
+    println!("✅ Published event with ID: {}", event_id);
+
     println!();
+    Ok(())
 }
 
-fn error_handling_example() {
-    println!("--- Error Handling ---");
-    
-    let adapter = BasicAdapter::default();
-    
-    // This should work
-    match adapter.operation("valid input") {
-        Ok(result) => println!("✅ Valid input processed: {}", result),
-        Err(e) => println!("❌ Unexpected error: {}", e),
+async fn batch_publishing_example() -> Result<(), Box<dyn std::error::Error>> {
+    println!("--- Batch Publishing ---");
+
+    let config = RedisConfig::default();
+    let adapter = RedisPubSubAdapter::new(config).await?;
+
+    // Create multiple events
+    let events = vec![
+        tyl_redis_pubsub_adapter::TopicEvent {
+            topic: "user.events".to_string(),
+            event: UserEvent {
+                user_id: "user1".to_string(),
+                action: "register".to_string(),
+                timestamp: 1234567891,
+            },
+            partition_key: None,
+        },
+        tyl_redis_pubsub_adapter::TopicEvent {
+            topic: "user.events".to_string(),
+            event: UserEvent {
+                user_id: "user2".to_string(),
+                action: "login".to_string(),
+                timestamp: 1234567892,
+            },
+            partition_key: None,
+        },
+    ];
+
+    // Publish events in batch
+    let event_ids = adapter.publish_batch(events).await?;
+    println!("✅ Published batch of {} events", event_ids.len());
+    for (i, event_id) in event_ids.iter().enumerate() {
+        println!("  Event {}: {}", i + 1, event_id);
     }
-    
-    // Example of error handling (implement error cases in your module)
-    println!("💡 Add error cases to demonstrate error handling in your module");
-    
+
     println!();
+    Ok(())
+}
+
+async fn keyed_publishing_example() -> Result<(), Box<dyn std::error::Error>> {
+    println!("--- Publishing with Partition Keys ---");
+
+    let config = RedisConfig::default();
+    let adapter = RedisPubSubAdapter::new(config).await?;
+
+    // Publish event with partition key for ordering
+    let event = UserEvent {
+        user_id: "user456".to_string(),
+        action: "purchase".to_string(),
+        timestamp: 1234567893,
+    };
+
+    let event_id = adapter
+        .publish_with_key("order.events", "user456", event)
+        .await?;
+    println!("✅ Published keyed event with ID: {}", event_id);
+
+    println!();
+    Ok(())
 }

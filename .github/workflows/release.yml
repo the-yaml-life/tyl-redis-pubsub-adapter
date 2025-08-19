@@ -32,7 +32,7 @@ jobs:
         body: |
           ## Changes in v${{ steps.get_version.outputs.VERSION }}
           
-          See [CHANGELOG.md](https://github.com/the-yaml-life/tyl-{module-name}/blob/main/CHANGELOG.md) for details.
+          See [CHANGELOG.md](https://github.com/the-yaml-life/tyl-redis-pubsub/blob/main/CHANGELOG.md) for details.
         draft: false
         prerelease: false
 
