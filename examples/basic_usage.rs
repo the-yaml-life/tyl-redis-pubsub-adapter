@@ -46,7 +46,7 @@ async fn basic_publishing_example() -> Result<(), Box<dyn std::error::Error>> {
 
     // Publish the event
     let event_id = adapter.publish("user.events", event).await?;
-    println!("✅ Published event with ID: {}", event_id);
+    println!("✅ Published event with ID: {event_id}");
 
     println!();
     Ok(())
@@ -107,7 +107,7 @@ async fn keyed_publishing_example() -> Result<(), Box<dyn std::error::Error>> {
     let event_id = adapter
         .publish_with_key("order.events", "user456", event)
         .await?;
-    println!("✅ Published keyed event with ID: {}", event_id);
+    println!("✅ Published keyed event with ID: {event_id}");
 
     println!();
     Ok(())

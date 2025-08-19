@@ -44,10 +44,10 @@ async fn test_redis_available_single_publish() {
             let event_id = result.unwrap();
             assert!(!event_id.is_empty(), "Should return valid event ID");
 
-            println!("✅ Published event with ID: {}", event_id);
+            println!("✅ Published event with ID: {event_id}");
         }
         Err(e) => {
-            println!("⚠️  Redis not available for integration test: {}", e);
+            println!("⚠️  Redis not available for integration test: {e}");
             println!("   To run this test, start Redis with:");
             println!("   docker run -d -p 6379:6379 redis:7-alpine");
             // Don't fail the test if Redis isn't available
@@ -98,7 +98,7 @@ async fn test_redis_available_batch_publish() {
             println!("✅ Published batch of {} events", event_ids.len());
         }
         Err(e) => {
-            println!("⚠️  Redis not available for batch test: {}", e);
+            println!("⚠️  Redis not available for batch test: {e}");
         }
     }
 }
@@ -135,7 +135,7 @@ async fn test_redis_available_transactional_publish() {
             println!("✅ Transactional publish completed");
         }
         Err(e) => {
-            println!("⚠️  Redis not available for transactional test: {}", e);
+            println!("⚠️  Redis not available for transactional test: {e}");
         }
     }
 }
@@ -162,7 +162,7 @@ async fn test_redis_available_health_check() {
             println!("✅ Health check passed");
         }
         Err(e) => {
-            println!("⚠️  Redis not available for health check test: {}", e);
+            println!("⚠️  Redis not available for health check test: {e}");
         }
     }
 }
@@ -226,10 +226,10 @@ async fn test_adapter_configuration_works() {
             println!("✅ Redis is available - adapter created successfully");
         }
         Err(e) => {
-            println!("⚠️  Redis not available - error is properly handled: {}", e);
+            println!("⚠️  Redis not available - error is properly handled: {e}");
             // Verify the error is a proper TYL error
             assert!(
-                e.to_string().len() > 0,
+                !e.to_string().is_empty(),
                 "Error should have meaningful message"
             );
         }

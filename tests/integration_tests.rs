@@ -157,10 +157,10 @@ async fn test_redis_adapter_composition() {
     match health_result {
         Ok(_) => println!("Health check passed - Redis adapter composition working"),
         Err(e) => {
-            println!("Health check failed (Redis might not be running): {}", e);
+            println!("Health check failed (Redis might not be running): {e}");
             // This is OK for testing - just verify error is proper TYL error
             assert!(
-                e.to_string().len() > 0,
+                !e.to_string().is_empty(),
                 "Should have meaningful error message"
             );
         }
